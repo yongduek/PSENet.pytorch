@@ -26,6 +26,20 @@ from utils.utils import load_checkpoint, save_checkpoint, setup_logger
 from pse import decode as pse_decode
 from cal_recall import cal_recall_precison_f1
 
+import imageio 
+
+def save_imsi(images, labels, masks):
+    i = 0
+    im = images[i].cpu().permute(1,2,0).numpy()
+    imageio.imwrite("im.png", im)
+
+    for k in range(labels.shape[1]):
+        im = labels[i,k].cpu().numpy()
+        imageio.imwrite(f'labels-{k}.png', im)
+
+    im = masks[0].cpu().numpy().astype(np.uint8)*255
+    imageio.imwrite('mask.png', im)
+    return 
 
 def weights_init(m):
     if isinstance(m, nn.Conv2d):
@@ -59,6 +73,7 @@ def train_epoch(net, optimizer, scheduler, train_loader, device, criterion, epoc
     # lr = adjust_learning_rate(optimizer, epoch)
     lr = scheduler.get_lr()[0]
     for i, (images, labels, training_mask) in enumerate(train_loader):
+        # save_imsi(images, labels, training_mask)
         cur_batch = images.size()[0]
         images, labels, training_mask = images.to(device), labels.to(device), training_mask.to(device)
         # Forward
@@ -213,7 +228,7 @@ def main():
             # net_save_path = '{}/PSENet_{}_loss{:.6f}.pth'.format(config.output_dir, epoch,
             #                                                                               train_loss)
             # save_checkpoint(net_save_path, models, optimizer, epoch, logger)
-            if (0.3 < train_loss < 0.4 and epoch % 4 == 0) or train_loss < 0.3:
+            if (0.3 < train_loss < 0.4 and epoch % 4 == 0) or (train_loss < 0.3) or (epoch == start_epoch):
                 recall, precision, f1 = eval(model, os.path.join(config.output_dir, 'output'), config.testroot, device)
                 logger.info('test: recall: {:.6f}, precision: {:.6f}, f1: {:.6f}'.format(recall, precision, f1))
 
@@ -260,4 +275,6 @@ def main():
 
 
 if __name__ == '__main__':
+    import os
+    os.environ["CUDA_VISIBLE_DEVICES"]="0,1,2,3"
     main()

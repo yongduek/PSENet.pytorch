@@ -3,18 +3,19 @@
 # @Author  : zhoujun
 
 # data config
-trainroot = '/data2/dataset/ICD15/train'
-testroot = '/data2/dataset/ICD15/test'
-output_dir = 'output/psenet_icd2015_resnet152_4gpu_author_crop_adam_MultiStepLR_authorloss'
+srcdir = '/home/yndk/datasets/icdar2015ch4'
+trainroot = srcdir + '/train'
+testroot = srcdir + '/test'
+output_dir = './output/'
 data_shape = 640
 
 # train config
 gpu_id = '2'
 workers = 12
 start_epoch = 0
-epochs = 600
+epochs = 1000
 
-train_batch_size = 4
+train_batch_size = 10
 
 lr = 1e-4
 end_lr = 1e-7
@@ -24,10 +25,10 @@ weight_decay = 5e-4
 warm_up_epoch = 6
 warm_up_lr = lr * lr_gamma
 
-display_input_images = False
-display_output_images = False
+display_input_images = True
+display_output_images = True
 display_interval = 10
-show_images_interval = 50
+show_images_interval = 10
 
 pretrained = True
 restart_training = True

@@ -28,8 +28,22 @@ class Pytorch_model:
         self.net = torch.load(model_path, map_location=self.device)['state_dict']
         print('device:', self.device)
 
+
+        # for i, k in enumerate(self.net):  # Saved with DataParallel!
+        #     print(i, k, f'self.net[{k}] is a weight set')
+
+
         if net is not None:
             # 如果网络计算图和参数是分开保存的，就执行参数加载
+            # This is due to the usage of DataParallel
+            # https://discuss.pytorch.org/t/solved-keyerror-unexpected-key-module-encoder-embedding-weight-in-state-dict/1686/17
+            #
+            # Instead of deleting the “module.” string from all the state_dict keys, you can save your model with:
+            #       torch.save(model.module.state_dict(), path_to_file)
+            # instead of
+            #       torch.save(model.state_dict(), path_to_file)
+            # that way you don’t get the “module.” string to begin with…
+
             net = net.to(self.device)
             net.scale = scale
             try:
@@ -99,14 +113,14 @@ if __name__ == '__main__':
     import matplotlib.pyplot as plt
     from utils.utils import show_img, draw_bbox
 
-    os.environ['CUDA_VISIBLE_DEVICES'] = str('2')
+    os.environ['CUDA_VISIBLE_DEVICES'] = str('0,1,2,3')
 
-    model_path = 'output/psenet_icd2015_resnet152_author_crop_adam_warm_up_myloss/best_r0.714011_p0.708214_f10.711100.pth'
+    model_path = 'output/best.pth'
 
-    # model_path = 'output/psenet_icd2015_new_loss/final.pth'
-    img_id = 10
-    img_path = '/data2/dataset/ICD15/test/img/img_{}.jpg'.format(img_id)
-    label_path = '/data2/dataset/ICD15/test/gt/gt_img_{}.txt'.format(img_id)
+    data_dir = '/home/yndk/datasets/icdar2015ch4'
+    img_id = 110
+    img_path = data_dir + '/test/img/img_{}.jpg'.format(img_id)
+    label_path = data_dir + '/test/gt/gt_img_{}.txt'.format(img_id)
     label = _get_annotation(label_path)
 
     # 初始化网络

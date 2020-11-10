@@ -50,8 +50,9 @@ if __name__ == '__main__':
     backbone = 'resnet152'
     scale = 4
     model_path = 'output/psenet_icd2015_resnet152_author_crop_adam_warm_up_myloss/best_r0.714011_p0.708214_f10.711100.pth'
-    data_path = '/data2/dataset/ICD15/test/img'
-    gt_path = '/data2/dataset/ICD15/test/gt'
+    srcdir = '/home/yndk/datasets/icdar2015ch4'
+    data_path = srcdir + '/test/img'
+    gt_path = srcdir + '/test/gt'
     save_path = './result/_scale{}'.format(scale)
     gpu_id = 0
     print('backbone:{},scale:{},model_path:{}'.format(backbone,scale,model_path))

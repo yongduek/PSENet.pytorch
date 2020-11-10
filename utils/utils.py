@@ -56,6 +56,13 @@ def setup_logger(log_file_path: str = None):
     logger.info('logger init finished')
     return logger
 
+# https://discuss.pytorch.org/t/solved-keyerror-unexpected-key-module-encoder-embedding-weight-in-state-dict/1686/17
+# Instead of deleting the “module.” string from all the state_dict keys, you can save your model with:
+#       torch.save(model.module.state_dict(), path_to_file)
+# instead of
+#       torch.save(model.state_dict(), path_to_file)
+# that way you don’t get the “module.” string to begin with…
+
 
 def save_checkpoint(checkpoint_path, model, optimizer, epoch, logger):
     state = {'state_dict': model.state_dict(),
